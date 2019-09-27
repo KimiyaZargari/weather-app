@@ -13,6 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -35,6 +39,7 @@ public class CityFragment extends Fragment {
     private  RecyclerView list;
     private URL url = null;
     private WeatherListAdapter listAdapter;
+    private singleWeather singleWeather[];
 
 
 
@@ -59,10 +64,11 @@ public class CityFragment extends Fragment {
         list.setLayoutManager(layoutManager);
         listAdapter = new WeatherListAdapter(20);
         list.setAdapter(listAdapter);
+        singleWeather = new singleWeather[15];
         try {
             Uri builtUri = Uri.parse(baseURL).buildUpon().appendQueryParameter("q", cityName).appendQueryParameter("APPID", APIKey).appendQueryParameter("mode", "json").build();
             url= new URL(builtUri.toString());
-            new WeatherQueryTast().execute(url);
+            new WeatherQueryTask().execute(url);
 
         }catch(MalformedURLException e) {
 
@@ -70,24 +76,38 @@ public class CityFragment extends Fragment {
         }
         return rootView;
     }
-    public class WeatherQueryTast extends AsyncTask <URL, Void, String>{
+    public class WeatherQueryTask extends AsyncTask <URL, Void, String>{
 
         @Override
         protected String doInBackground(URL... urls) {
             URL url = urls[0];
             Log.d("num", url.toString());
             String result = null;
+            JSONObject jsonObject = null;
             try {
                 result = NetworkUtils.getResponseFromHttpURL(url);
+                jsonObject = new JSONObject(result);
+                JSONArray jsonArray = jsonObject.getJSONArray("list");
+                for (int i = 0; i < 15; i++){
+                     jsonObject =  (JSONObject) jsonArray.get(i);
+                     JSONObject main = jsonObject.getJSONObject("main");
+                     JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
+                     singleWeather[i] = new singleWeather(main.getLong("temp"), main.getLong("temp_min"), main.getLong("temp_max"), main.getLong("pressure"), main.getInt("humidity"), weather.getString("main"), weather.getString("description"), weather.getString("icon"));
+
+                }
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e){
+                Log.d("num", e.getMessage());
             }
-        return result;
+
+
+        return jsonObject.toString();
         }
 
         @Override
         protected void onPostExecute(String s) {
-           Log.d("num", s);
+           Log.d("num", singleWeather[0].getMain());
         }
     }
 
