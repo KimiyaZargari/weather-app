@@ -1,6 +1,6 @@
 package com.example.windows10.newweather;
 
-public class singleWeather {
+public class WeatherDescription {
     private float temp;
 
     public float getTemp() {
@@ -44,7 +44,7 @@ public class singleWeather {
     private String icon;
 
 
-    public singleWeather(float temp, float temp_min, float temp_max, float pressure, int humidity, String main, String description, String icon) {
+    public WeatherDescription(float temp, float temp_min, float temp_max, float pressure, int humidity, String main, String description, String icon) {
         this.temp = temp;
         this.temp_min = temp_min;
         this.temp_max = temp_max;

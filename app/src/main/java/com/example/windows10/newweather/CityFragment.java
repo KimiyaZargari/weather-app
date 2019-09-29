@@ -1,6 +1,5 @@
 package com.example.windows10.newweather;
 
-import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,13 +17,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.security.PublicKey;
-import java.util.Scanner;
 
 /**
  * Created by Windows 10 on 30/09/2017.
@@ -39,7 +33,11 @@ public class CityFragment extends Fragment {
     private  RecyclerView list;
     private URL url = null;
     private WeatherListAdapter listAdapter;
-    private singleWeather singleWeather[];
+    private WeatherDescription weathers[];
+
+    public WeatherDescription[] getWeathers() {
+        return weathers;
+    }
 
 
 
@@ -62,9 +60,9 @@ public class CityFragment extends Fragment {
         list = rootView.findViewById(R.id.weather_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         list.setLayoutManager(layoutManager);
-        listAdapter = new WeatherListAdapter(20);
+        listAdapter = new WeatherListAdapter(15, this);
         list.setAdapter(listAdapter);
-        singleWeather = new singleWeather[15];
+        weathers = new WeatherDescription[15];
         try {
             Uri builtUri = Uri.parse(baseURL).buildUpon().appendQueryParameter("q", cityName).appendQueryParameter("APPID", APIKey).appendQueryParameter("mode", "json").build();
             url= new URL(builtUri.toString());
@@ -92,7 +90,7 @@ public class CityFragment extends Fragment {
                      jsonObject =  (JSONObject) jsonArray.get(i);
                      JSONObject main = jsonObject.getJSONObject("main");
                      JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
-                     singleWeather[i] = new singleWeather(main.getLong("temp"), main.getLong("temp_min"), main.getLong("temp_max"), main.getLong("pressure"), main.getInt("humidity"), weather.getString("main"), weather.getString("description"), weather.getString("icon"));
+                     weathers[i] = new WeatherDescription(main.getLong("temp"), main.getLong("temp_min"), main.getLong("temp_max"), main.getLong("pressure"), main.getInt("humidity"), weather.getString("main"), weather.getString("description"), weather.getString("icon"));
 
                 }
             } catch (IOException e) {
@@ -107,7 +105,9 @@ public class CityFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String s) {
-           Log.d("num", singleWeather[0].getMain());
+           Log.d("num", weathers[0].getMain());
+            listAdapter.notifyDataSetChanged();
+
         }
     }
 

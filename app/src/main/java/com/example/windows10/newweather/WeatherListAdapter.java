@@ -9,9 +9,14 @@ import android.widget.TextView;
 
 public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.MyViewHolder> {
     private int numOfItems;
-    public WeatherListAdapter(int numOfItems){
+    private CityFragment city;
+
+
+    public WeatherListAdapter(int numOfItems, CityFragment city){
         this.numOfItems = numOfItems;
+        this.city = city;
     }
+
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Context context = parent.getContext();
@@ -25,6 +30,8 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
         holder.bind(position);
+        if (city.getWeathers()[position] != null)
+        holder.description.setText(city.getWeathers()[position].getDescription());
     }
 
 
@@ -35,13 +42,14 @@ public class WeatherListAdapter extends RecyclerView.Adapter<WeatherListAdapter.
 
     class MyViewHolder extends RecyclerView.ViewHolder
     {
-        TextView listItem;
+        TextView description;
         public MyViewHolder(View itemView){
             super(itemView);
-            listItem = (TextView) itemView.findViewById(R.id.weather_item_text);
+            description = (TextView) itemView.findViewById(R.id.weatherDescription);
         }
         void bind(int listIndex){
-            listItem.setText(String.valueOf(listIndex));
+            //if (city.getWeathers()[listIndex] != null)
+            //description.setText(city.getWeathers()[listIndex].getDescription());
 
         }
     }
