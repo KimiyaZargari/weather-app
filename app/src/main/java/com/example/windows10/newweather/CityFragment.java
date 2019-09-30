@@ -1,5 +1,7 @@
 package com.example.windows10.newweather;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -64,7 +66,7 @@ public class CityFragment extends Fragment {
         list.setAdapter(listAdapter);
         weathers = new WeatherDescription[15];
         try {
-            Uri builtUri = Uri.parse(baseURL).buildUpon().appendQueryParameter("q", cityName).appendQueryParameter("APPID", APIKey).appendQueryParameter("mode", "json").build();
+            Uri builtUri = Uri.parse(baseURL).buildUpon().appendQueryParameter("q", cityName).appendQueryParameter("APPID", APIKey).appendQueryParameter("mode", "json").appendQueryParameter("units", "metric").build();
             url= new URL(builtUri.toString());
             new WeatherQueryTask().execute(url);
 
@@ -90,7 +92,15 @@ public class CityFragment extends Fragment {
                      jsonObject =  (JSONObject) jsonArray.get(i);
                      JSONObject main = jsonObject.getJSONObject("main");
                      JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
-                     weathers[i] = new WeatherDescription(main.getLong("temp"), main.getLong("temp_min"), main.getLong("temp_max"), main.getLong("pressure"), main.getInt("humidity"), weather.getString("main"), weather.getString("description"), weather.getString("icon"));
+                     weathers[i] = new WeatherDescription(jsonObject.getLong("dt"), main.getLong("temp"), main.getLong("temp_min"), main.getLong("temp_max"), main.getLong("pressure"), main.getInt("humidity"), weather.getString("main"), weather.getString("description"), weather.getString("icon"));
+                     try{
+                         String pic = "http://openweathermap.org/img/wn/" + weathers[i].getIcon() + "@2x.png";
+                         URL iconURL = new URL(pic);
+                         weathers[i].setBitmap( BitmapFactory.decodeStream(iconURL.openConnection().getInputStream()));
+
+                     }catch (MalformedURLException e) {
+                         Log.d("num", e.getMessage());
+                     }
 
                 }
             } catch (IOException e) {
@@ -115,4 +125,6 @@ public class CityFragment extends Fragment {
         return cityName;
 
     }
+
+
 }
